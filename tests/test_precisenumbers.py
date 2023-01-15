@@ -159,3 +159,41 @@ def test_precisenumber_repr():
 def test_parse_number():
     with pytest.raises(NotImplementedError):
         precisenumbers.parse_number([1, 2])
+
+
+def test__add__():
+    # Add another PreciseNumber
+    # - Same precision
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(98.654) == precisenumbers.PreciseNumber('110.999')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(98.765) == precisenumbers.PreciseNumber('111.110')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(-98.765) == precisenumbers.PreciseNumber('-86.420')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(-98.265) == precisenumbers.PreciseNumber('-85.920')
+
+    # - Different precisions
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(98.65) == precisenumbers.PreciseNumber('110.99')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(98.76) == precisenumbers.PreciseNumber('111.10')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(-98.76) == precisenumbers.PreciseNumber('-86.42')
+    assert precisenumbers.PreciseNumber(12.345) + precisenumbers.PreciseNumber(-98.26) == precisenumbers.PreciseNumber('-85.92')
+
+    # Add a float
+    assert precisenumbers.PreciseNumber(98.654) + 12.345 == precisenumbers.PreciseNumber('110.999')
+
+    # Add an integer
+    assert precisenumbers.PreciseNumber(98.654) + 12 == precisenumbers.PreciseNumber('110')
+
+    # Add a string
+    assert precisenumbers.PreciseNumber(98.654) + '12.345' == precisenumbers.PreciseNumber('110.999')
+
+
+def test__sub__():
+    # Subtract another PreciseNumber
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(-98.654) == precisenumbers.PreciseNumber('110.999')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(-98.765) == precisenumbers.PreciseNumber('111.110')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(98.765) == precisenumbers.PreciseNumber('-86.420')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(98.265) == precisenumbers.PreciseNumber('-85.920')
+
+    # - Different precisions
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(-98.65) == precisenumbers.PreciseNumber('110.99')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(-98.76) == precisenumbers.PreciseNumber('111.10')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(98.76) == precisenumbers.PreciseNumber('-86.42')
+    assert precisenumbers.PreciseNumber(12.345) - precisenumbers.PreciseNumber(98.26) == precisenumbers.PreciseNumber('-85.92')

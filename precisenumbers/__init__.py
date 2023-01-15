@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import math
 from typing import Optional, Tuple, Union
@@ -54,7 +56,12 @@ class PreciseNumber:
     MAXIMUM: Optional[Union[float, int]] = None
     MINIMUM: Optional[Union[float, int]] = None
 
-    def __init__(self, number: Union[float, int, str], precision: Optional[int] = None):
+    def __init__(
+        self,
+        number: Union[float, int, str],
+        precision: Optional[int] = None,
+        warn_inferred: bool = True,
+    ):
         if precision and precision < 0:
             raise ValueError('precision must be >= 0')
 
@@ -70,7 +77,7 @@ class PreciseNumber:
         if precision is None or precision == inferred_precision:
             self.fractional, self.precision = inferred_fractional, inferred_precision
         else:
-            if precision < inferred_precision:
+            if precision < inferred_precision and warn_inferred:
                 logger.warning(
                     f'inferred precision value is {inferred_precision}; using specified precision value of {precision}, '
                     + 'which may result in data loss'
@@ -131,6 +138,21 @@ class PreciseNumber:
             return True
         return False
 
+    def __add__(self, __o: object) -> bool:
+        if not isinstance(__o, (PreciseNumber, float, int, str)):
+            raise ValueError(
+                'added object must be of type PreciseNumber, float, int, or str'
+            )
+        return self.add(value=__o)
+
+    def __sub__(self, __o: object) -> bool:
+        if not isinstance(__o, PreciseNumber):
+            return False
+        str_o = str(__o)
+        return self + PreciseNumber(
+            str_o.lstrip('-') if str_o.startswith('-') else '-' + str_o
+        )
+
     def __float__(self) -> float:
         """Provides the float representation of the PreciseNumber"""
         return self.multiplier * (self.integer + self.fractional / 10**self.precision)
@@ -146,3 +168,47 @@ class PreciseNumber:
             return negative_indicator + str(self.integer)
 
         return f'{negative_indicator}{self.integer}.{"0" * (self.precision - len(str(self.fractional))) + str(self.fractional)}'
+
+    def add(
+        self,
+        value: Union[PreciseNumber, float, int, str],
+        precision: Optional[int] = None,
+    ) -> PreciseNumber:
+        """Add another value to the current value.
+
+        Args:
+            value: the new value to be added
+            precision: the precision to use for both values
+
+        Returns:
+            PreciseNumber: the addition of the two values
+        """
+
+        # Find precision, if not provided
+        if not precision:
+            __o_pn = PreciseNumber(str(value))
+            if self.precision != __o_pn.precision:
+                logger.warning('precisions differ; minimum precision will be used')
+            precision = min(self.precision, __o_pn.precision)
+
+        # Convert values to PreciseNumbers of the relevant precision
+        s_pn = PreciseNumber(str(self), precision=precision, warn_inferred=False)
+        o_pn = PreciseNumber(str(value), precision=precision, warn_inferred=False)
+
+        # Add individual components; carry values as appropriate
+        new_integer = s_pn.integer + o_pn.multiplier * o_pn.integer
+        new_fractional = s_pn.fractional + o_pn.multiplier * o_pn.fractional
+        integer_addition = 0
+
+        if (new_integer < 0) ^ (new_fractional < 0):
+            integer_addition = 1 if new_integer < 0 else -1
+            new_fractional = 10**precision - new_fractional
+
+        if len(str(abs(new_fractional))) > precision and precision != 0:
+            integer_addition = 1
+            new_fractional = int(str(abs(new_fractional))[-precision:])
+
+        return PreciseNumber(
+            f'{new_integer + integer_addition}.{abs(new_fractional)}',
+            precision=precision,
+        )

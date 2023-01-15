@@ -51,7 +51,7 @@ class Coordinate:
                 str(self.longitude),
                 self.longitude.precision,
                 str(self.latitude),
-                self.latitude.precision
+                self.latitude.precision,
             )
         )
 
