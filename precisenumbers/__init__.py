@@ -116,6 +116,16 @@ class PreciseNumber:
         """Change a fractional using one precision to a fractional using another precision"""
         return int(fractional * (10 ** (new_precision - current_precision)))
 
+    def __add__(self, other):
+        """Addition"""
+        if not isinstance(other, PreciseNumber):
+            other = PreciseNumber(other)
+
+        return PreciseNumber(
+            float(self) + float(other),
+            precision=min(self.precision, other.precision)
+        )
+
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, PreciseNumber):
             return False
@@ -146,3 +156,13 @@ class PreciseNumber:
             return negative_indicator + str(self.integer)
 
         return f'{negative_indicator}{self.integer}.{"0" * (self.precision - len(str(self.fractional))) + str(self.fractional)}'
+
+    def __sub__(self, other):
+        """Addition"""
+        if not isinstance(other, PreciseNumber):
+            other = PreciseNumber(other)
+
+        return PreciseNumber(
+            float(self) - float(other),
+            precision=min(self.precision, other.precision)
+        )

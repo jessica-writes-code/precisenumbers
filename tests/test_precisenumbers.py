@@ -159,3 +159,17 @@ def test_precisenumber_repr():
 def test_parse_number():
     with pytest.raises(NotImplementedError):
         precisenumbers.parse_number([1, 2])
+
+
+def test_add():
+    num = precisenumbers.PreciseNumber('1.0')
+    assert num + precisenumbers.PreciseNumber('1.0') == precisenumbers.PreciseNumber('2.0')
+    assert num + 1.0 == precisenumbers.PreciseNumber('2.0')
+    assert num + 1 == precisenumbers.PreciseNumber('2')
+
+
+def test_subtract():
+    num = precisenumbers.PreciseNumber('1.0')
+    assert num - precisenumbers.PreciseNumber('1.0') == precisenumbers.PreciseNumber('0.0')
+    assert num - 1.0 == precisenumbers.PreciseNumber('0.0')
+    assert num - 1 == precisenumbers.PreciseNumber('0')
