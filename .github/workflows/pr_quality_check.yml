@@ -22,7 +22,7 @@ jobs:
 
       - name: Lint with flake8
         run: |
-          flake8 entity_resolution --count --show-source --statistics --max-line-length=100
+          flake8 precisenumbers --count --show-source --statistics --max-line-length=100
 
       - name: Pytest
         run: |
