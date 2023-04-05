@@ -5,6 +5,22 @@ from typing import Optional, Tuple, Union
 logger = logging.getLogger(__name__)
 
 
+def _float_to_str(f: float) -> str:
+    float_string = repr(f)
+    if 'e' not in float_string:  # detect scientific notation
+        return float_string
+
+    digits, exp = float_string.split('e')
+    digits = digits.replace('.', '').replace('-', '')
+    exp = int(exp)
+    zero_padding = '0' * (abs(exp) - 1)  # minus 1 for decimal point in the sci notation
+    sign = '-' if f < 0 else ''
+    if exp > 0:
+        return '{}{}{}'.format(sign, digits, zero_padding)
+
+    return '{}0.{}{}'.format(sign, zero_padding, digits)
+
+
 def parse_number(number: Union[float, int, str]) -> Tuple[int, int, int, int]:
     """Segment a number into the boolean negative indicator (which will be used to create
     the multiplier), integer, fractional, and precision
@@ -31,7 +47,7 @@ def parse_number(number: Union[float, int, str]) -> Tuple[int, int, int, int]:
     if isinstance(number, int):
         return negative, abs(number), 0, 0
 
-    number = str(number)
+    number = _float_to_str(number)
 
     if '.' in number:
         integer_str, fractional_str = number.split('.')
