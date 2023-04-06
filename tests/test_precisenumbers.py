@@ -167,9 +167,15 @@ def test_add():
     assert num + 1.0 == precisenumbers.PreciseNumber('2.0')
     assert num + 1 == precisenumbers.PreciseNumber('2')
 
+    num = precisenumbers.PreciseNumber('1.00001')
+    assert num + 2.005 == precisenumbers.PreciseNumber('3.005')
+
 
 def test_subtract():
     num = precisenumbers.PreciseNumber('1.0')
     assert num - precisenumbers.PreciseNumber('1.0') == precisenumbers.PreciseNumber('0.0')
     assert num - 1.0 == precisenumbers.PreciseNumber('0.0')
     assert num - 1 == precisenumbers.PreciseNumber('0')
+
+    num = precisenumbers.PreciseNumber('1.00001')
+    assert num - 2.005 == precisenumbers.PreciseNumber('-1.004')
