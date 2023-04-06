@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 
 def _float_to_str(f: float) -> str:
-    float_string = repr(f)
+    float_string = str(f)
     if 'e' not in float_string:  # detect scientific notation
         return float_string
 
