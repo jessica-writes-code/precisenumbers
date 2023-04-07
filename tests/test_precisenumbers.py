@@ -169,6 +169,7 @@ def test_add():
 
     num = precisenumbers.PreciseNumber('1.00001')
     assert num + 2.005 == precisenumbers.PreciseNumber('3.005')
+    assert num + 2.0045 == precisenumbers.PreciseNumber('3.005')
 
 
 def test_subtract():
@@ -178,7 +179,8 @@ def test_subtract():
     assert num - 1 == precisenumbers.PreciseNumber('0')
 
     num = precisenumbers.PreciseNumber('1.00001')
-    assert num - 2.005 == precisenumbers.PreciseNumber('-1.004')
+    assert num - 2.005 == precisenumbers.PreciseNumber('-1.005')
+    assert num - 2.0045 == precisenumbers.PreciseNumber('-1.004')
 
 
 def test_float_to_str():
@@ -191,3 +193,13 @@ def test_float_to_str():
     assert precisenumbers._float_to_str(-1) == '-1'
     assert precisenumbers._float_to_str(-1e-07) == '-0.0000001'
     assert precisenumbers._float_to_str(-1e+16) == '-1000000000000000'
+
+
+def test_round_half_up():
+    assert precisenumbers._round_half_up(1.00041, 4) == 1.0004
+    assert precisenumbers._round_half_up(1.00046, 4) == 1.0005
+    assert precisenumbers._round_half_up(1.00045, 4) == 1.0005
+
+    assert precisenumbers._round_half_up(-1.00041, 4) == -1.0004
+    assert precisenumbers._round_half_up(-1.00046, 4) == -1.0005
+    assert precisenumbers._round_half_up(-1.00045, 4) == -1.0005
