@@ -5,6 +5,22 @@ from typing import Optional, Tuple, Union
 logger = logging.getLogger(__name__)
 
 
+def _float_to_str(f: float) -> str:
+    float_string = str(f)
+    if 'e' not in float_string:  # detect scientific notation
+        return float_string
+
+    digits, exp = float_string.split('e')
+    digits = digits.replace('.', '').replace('-', '')
+    exp = int(exp)
+    zero_padding = '0' * (abs(exp) - 1)  # minus 1 for decimal point in the sci notation
+    sign = '-' if f < 0 else ''
+    if exp > 0:
+        return '{}{}{}'.format(sign, digits, zero_padding)
+
+    return '{}0.{}{}'.format(sign, zero_padding, digits)
+
+
 def parse_number(number: Union[float, int, str]) -> Tuple[int, int, int, int]:
     """Segment a number into the boolean negative indicator (which will be used to create
     the multiplier), integer, fractional, and precision
@@ -31,7 +47,7 @@ def parse_number(number: Union[float, int, str]) -> Tuple[int, int, int, int]:
     if isinstance(number, int):
         return negative, abs(number), 0, 0
 
-    number = str(number)
+    number = _float_to_str(number)
 
     if '.' in number:
         integer_str, fractional_str = number.split('.')
@@ -72,7 +88,8 @@ class PreciseNumber:
         else:
             if precision < inferred_precision:
                 logger.warning(
-                    f'inferred precision value is {inferred_precision}; using specified precision value of {precision}, '
+                    f'inferred precision value is {inferred_precision}; using specified '
+                    + f'precision value of {precision}, '
                     + 'which may result in data loss'
                 )
             self.fractional = self._change_power_of_ten(
@@ -146,16 +163,25 @@ class PreciseNumber:
         return self.multiplier * (self.integer + self.fractional / 10**self.precision)
 
     def __repr__(self) -> str:
-        return f'PreciseNumber(multiplier={self.multiplier}, integer={self.integer}, fractional={self.fractional}, precision={self.precision})'
+        m = f'multiplier={self.multiplier}'
+        i = f'integer={self.integer}'
+        f = f'fractional={self.fractional}'
+        p = f'precision={self.precision}'
+
+        return f'PreciseNumber({m}, {i}, {f}, {p})'
 
     def __str__(self) -> str:
         """Provides the string representation of the PreciseNumber"""
         negative_indicator = '-' if self.multiplier == -1 else ''
+        num_zeros = (self.precision - len(str(self.fractional)))
 
         if self.precision == 0:
             return negative_indicator + str(self.integer)
 
-        return f'{negative_indicator}{self.integer}.{"0" * (self.precision - len(str(self.fractional))) + str(self.fractional)}'
+        before_decimal = f'{negative_indicator}{self.integer}'
+        after_decimal = f'{"0" * num_zeros + str(self.fractional)}'
+
+        return f'{before_decimal}.{after_decimal}'
 
     def __sub__(self, other):
         """Addition"""

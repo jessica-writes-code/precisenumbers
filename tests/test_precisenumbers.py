@@ -179,3 +179,15 @@ def test_subtract():
 
     num = precisenumbers.PreciseNumber('1.00001')
     assert num - 2.005 == precisenumbers.PreciseNumber('-1.004')
+
+
+def test_float_to_str():
+    assert precisenumbers._float_to_str(1.0) == '1.0'
+    assert precisenumbers._float_to_str(1) == '1'
+    assert precisenumbers._float_to_str(1e-07) == '0.0000001'
+    assert precisenumbers._float_to_str(1e+16) == '1000000000000000'
+
+    assert precisenumbers._float_to_str(-1.0) == '-1.0'
+    assert precisenumbers._float_to_str(-1) == '-1'
+    assert precisenumbers._float_to_str(-1e-07) == '-0.0000001'
+    assert precisenumbers._float_to_str(-1e+16) == '-1000000000000000'
