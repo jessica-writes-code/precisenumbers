@@ -153,7 +153,7 @@ def test_PreciseNumber_equality():
 
 
 def test_precisenumber_repr():
-    assert precisenumbers.PreciseNumber(1.0, precision=5).__repr__() == 'PreciseNumber(multiplier=1, integer=1, fractional=0, precision=5)'
+    assert precisenumbers.PreciseNumber(1.0, precision=5).__repr__() == 'PreciseNumber(1.00000)'
 
 
 def test_parse_number():
