@@ -153,12 +153,7 @@ class PreciseNumber:
         return self.multiplier * (self.integer + self.fractional / 10**self.precision)
 
     def __repr__(self) -> str:
-        m = f'multiplier={self.multiplier}'
-        i = f'integer={self.integer}'
-        f = f'fractional={self.fractional}'
-        p = f'precision={self.precision}'
-
-        return f'PreciseNumber({m}, {i}, {f}, {p})'
+        return f'PreciseNumber({str(self)})'
 
     def __str__(self) -> str:
         """Provides the string representation of the PreciseNumber"""
