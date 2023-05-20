@@ -76,7 +76,9 @@ class PreciseNumber:
         if precision and precision < 0:
             raise ValueError('precision must be >= 0')
 
-        PreciseNumberTuple = namedtuple('PreciseNumberTuple', 'negative integer fractional precision')
+        PreciseNumberTuple = namedtuple(
+            'PreciseNumberTuple', 'negative integer fractional precision'
+        )
 
         # Parse input number
         (
@@ -101,10 +103,7 @@ class PreciseNumber:
             )
 
         # Ensure validity vs. MAXIMUM_PRECISION, MINIMUM, MAXIMUM
-        if (
-            self.MAXIMUM_PRECISION is not None
-            and precision > self.MAXIMUM_PRECISION
-        ):
+        if self.MAXIMUM_PRECISION is not None and precision > self.MAXIMUM_PRECISION:
             if self.PRECISION_WARNING:
                 logger.warning(
                     'precision exceeds maximum allowable value, which may indicate errors in data; '
@@ -118,21 +117,23 @@ class PreciseNumber:
             raise ValueError(
                 f'number outside of valid range of ({self.MINIMUM}, {self.MAXIMUM})'
             )
-        
-        self._precisenumber = PreciseNumberTuple(negative, integer, fractional, precision)
+
+        self._precisenumber = PreciseNumberTuple(
+            negative, integer, fractional, precision
+        )
 
     @property
     def negative(self):
         return self._precisenumber.negative
-    
+
     @property
     def integer(self):
         return self._precisenumber.integer
-    
+
     @property
     def fractional(self):
         return self._precisenumber.fractional
-    
+
     @property
     def precision(self):
         return self._precisenumber.precision
@@ -183,7 +184,7 @@ class PreciseNumber:
     def __str__(self) -> str:
         """Provides the string representation of the PreciseNumber"""
         negative_indicator = '-' if self.multiplier == -1 else ''
-        num_zeros = (self.precision - len(str(self.fractional)))
+        num_zeros = self.precision - len(str(self.fractional))
 
         if self.precision == 0:
             return negative_indicator + str(self.integer)
