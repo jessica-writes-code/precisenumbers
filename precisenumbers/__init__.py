@@ -163,7 +163,7 @@ class PreciseNumber:
     def __str__(self) -> str:
         """Provides the string representation of the PreciseNumber"""
         negative_indicator = '-' if self.multiplier == -1 else ''
-        num_zeros = (self.precision - len(str(self.fractional)))
+        num_zeros = self.precision - len(str(self.fractional))
 
         if self.precision == 0:
             return negative_indicator + str(self.integer)
