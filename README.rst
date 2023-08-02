@@ -30,16 +30,13 @@ accessing its float and string representations.
 
 .. code-block:: pycon
 
-    >>> from precisenumbers.coordinates import Coordinate
-    >>> location = Coordinate(longitude=90.1, latitude=10.23, precision=3)
-    >>> location.longitude
-    PreciseNumber(multiplier=1, integer=90, fractional=100, precision=3)
-    >>> float(location.longitude)
-    90.1
-    >>> str(location.longitude)
-    '90.100'
-    >>> location.longitude.precision
-    3
+    >>> from precisenumbers import PreciseNumber
+    >>> pn1 = PreciseNumber('10.01')
+    >>> pn2 = PreciseNumber(10.01)
+    >>> pn2 == pn2
+    True
+    >>> pn1.precision
+    2
 
 
 Requirements
