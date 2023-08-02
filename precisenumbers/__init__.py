@@ -1,6 +1,8 @@
+from collections import namedtuple
+from typing import Optional, Tuple, Union
 import logging
 import math
-from typing import Optional, Tuple, Union
+
 
 logger = logging.getLogger(__name__)
 
@@ -74,17 +76,21 @@ class PreciseNumber:
         if precision and precision < 0:
             raise ValueError('precision must be >= 0')
 
+        PreciseNumberTuple = namedtuple(
+            'PreciseNumberTuple', 'negative integer fractional precision'
+        )
+
         # Parse input number
         (
-            self.negative,
-            self.integer,
+            negative,
+            integer,
             inferred_fractional,
             inferred_precision,
         ) = parse_number(number)
 
         # Handle optional precision kwarg
         if precision is None or precision == inferred_precision:
-            self.fractional, self.precision = inferred_fractional, inferred_precision
+            fractional, precision = inferred_fractional, inferred_precision
         else:
             if precision < inferred_precision:
                 logger.warning(
@@ -92,17 +98,12 @@ class PreciseNumber:
                     + f'precision value of {precision}, '
                     + 'which may result in data loss'
                 )
-            self.fractional = self._change_power_of_ten(
+            fractional = self._change_power_of_ten(
                 inferred_fractional, inferred_precision, precision
             )
 
-            self.precision = precision
-
         # Ensure validity vs. MAXIMUM_PRECISION, MINIMUM, MAXIMUM
-        if (
-            self.MAXIMUM_PRECISION is not None
-            and self.precision > self.MAXIMUM_PRECISION
-        ):
+        if self.MAXIMUM_PRECISION is not None and precision > self.MAXIMUM_PRECISION:
             if self.PRECISION_WARNING:
                 logger.warning(
                     'precision exceeds maximum allowable value, which may indicate errors in data; '
@@ -116,6 +117,26 @@ class PreciseNumber:
             raise ValueError(
                 f'number outside of valid range of ({self.MINIMUM}, {self.MAXIMUM})'
             )
+
+        self._precisenumber = PreciseNumberTuple(
+            negative, integer, fractional, precision
+        )
+
+    @property
+    def negative(self):
+        return self._precisenumber.negative
+
+    @property
+    def integer(self):
+        return self._precisenumber.integer
+
+    @property
+    def fractional(self):
+        return self._precisenumber.fractional
+
+    @property
+    def precision(self):
+        return self._precisenumber.precision
 
     @classmethod
     def set_precision_warning_false(cls):
