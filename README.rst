@@ -25,7 +25,7 @@ facilitates easy access to alternative -- e.g., float and string -- representati
 Usage
 =====
 
-Below is a typical example of creating a Coordinate that has a particular precision and then
+Below is a typical example of creating a number that has a particular precision and then
 accessing its float and string representations.
 
 .. code-block:: pycon
