@@ -1,3 +1,4 @@
+import decimal
 import logging
 import math
 from typing import Optional, Tuple, Union
@@ -19,6 +20,14 @@ def _float_to_str(f: float) -> str:
         return '{}{}{}'.format(sign, digits, zero_padding)
 
     return '{}0.{}{}'.format(sign, zero_padding, digits)
+
+
+def _round_half_up(value: float, precision: int) -> float:
+    return float(
+        decimal.Decimal(_float_to_str(value)).quantize(
+            decimal.Decimal(10) ** -precision, rounding=decimal.ROUND_HALF_UP
+        )
+    )
 
 
 def parse_number(number: Union[float, int, str]) -> Tuple[int, int, int, int]:
@@ -133,6 +142,18 @@ class PreciseNumber:
         """Change a fractional using one precision to a fractional using another precision"""
         return int(fractional * (10 ** (new_precision - current_precision)))
 
+    def __add__(self, other):
+        """Addition"""
+        if not isinstance(other, PreciseNumber):
+            other = PreciseNumber(other)
+
+        precision = min(self.precision, other.precision)
+
+        return PreciseNumber(
+            _round_half_up(float(self) + float(other), precision),
+            precision=precision
+        )
+
     def __eq__(self, __o: object) -> bool:
         if not isinstance(__o, PreciseNumber):
             return False
@@ -172,3 +193,15 @@ class PreciseNumber:
         after_decimal = f'{"0" * num_zeros + str(self.fractional)}'
 
         return f'{before_decimal}.{after_decimal}'
+
+    def __sub__(self, other):
+        """Addition"""
+        if not isinstance(other, PreciseNumber):
+            other = PreciseNumber(other)
+
+        precision = min(self.precision, other.precision)
+
+        return PreciseNumber(
+            _round_half_up(float(self) - float(other), precision),
+            precision=precision
+        )
